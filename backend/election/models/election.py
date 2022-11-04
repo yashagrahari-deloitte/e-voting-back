@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import JSONField
-
+from home.models import OfficialsDetails
 
 class ElectionDropdown(models.Model):
     sno = models.AutoField(db_column='Sno',primary_key=True)
@@ -25,7 +25,9 @@ class ElectionInfo(models.Model):
     description_language = JSONField(default=dict)
     election_type = models.ForeignKey('ElectionDropdown', on_delete=models.PROTECT)
     phases = models.IntegerField()
+    added_by = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
     session = models.ForeignKey('Electiontiming', on_delete=models.PROTECT)
+    status = models.CharField(max_length=16, blank=True, null=True)
 
     class Meta:
         managed = True
@@ -35,7 +37,7 @@ class ElectionLockingUnlocking(models.Model):
     unlock_from = models.DateTimeField(default=None, null=True)
     unlock_to = models.DateTimeField(default=None, null=True)
     status = models.CharField(db_column='status', default='INSERT', max_length=16)
-    # unlocked_by = models.ForeignKey()
+    unlocked_by = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
     session = models.ForeignKey('Electiontiming', on_delete=models.PROTECT)
     created_at = models.DateTimeField(db_column='created_at',auto_now=True)
 

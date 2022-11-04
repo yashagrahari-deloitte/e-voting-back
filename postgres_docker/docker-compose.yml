@@ -9,7 +9,7 @@ services:
     environment:
       - POSTGRES_HOST_AUTH_METHOD=trust
       - POSTGRES_USER=demo
-      - POSTGRES_PASS = demo
+      - POSTGRES_PASS=demo
       - POSTGRES_DB=election
       - POSTGRES_PORT=5432
     ports:
