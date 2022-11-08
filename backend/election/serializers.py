@@ -8,7 +8,8 @@ class ElectionInfoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ElectionInfo
-        fields = ['id','title','election_category','phases','session']
+        fields = '__all__'
+        # fields = ['id','title','election_category','phases','session','current_status','description_language']
         read_only_fields = ['id']
 
 

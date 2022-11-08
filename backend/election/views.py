@@ -2,7 +2,10 @@ from django.shortcuts import render
 
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from election.models import ElectionInfo, Electiontiming, ElectionDropdown
+from home.models import OfficialsDetails
 from election import serializers
 from helpers.ElectionTiming_helper import ElectionTimingHelper
 from home.authentication import SafeJWTAuthentication
@@ -24,6 +27,37 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
         print(session_id)
         queryset = ElectionInfo.objects.filter(session_id=session_id,status='INSERT')
         return queryset 
+    
+    def perform_create(self, serializer):
+        official = OfficialsDetails.objects.get(official_id = self.request.user)
+        if self.request.user.is_authenticated:
+            instance = serializer.save(added_by=official,status='INSERT',current_status='DRAFTED')
+
+
+    
+
+    @action(detail=False, url_path=r'poll-info',)
+    def post_info(self,request):
+        if 'session_id' in self.request.query_params: 
+            session_id = self.request.query_params.get('session_id')
+        else:
+            session = ElectionTimingHelper.get_current_session()
+            session_id = session.uid
+        queryset = ElectionInfo.objects.filter(session_id=session_id,status='INSERT')
+        polls_info = {
+            'active':0,
+            'completed':0,
+            'drafted':0
+        }
+        for query in queryset:
+            current_status = query.current_status
+            if 'ACTIVE' in current_status:
+                polls_info['active']+=1
+            elif 'COMPLETED' in current_status:
+                polls_info['completed']+=1
+            elif 'DRAFTED' in current_status:
+                polls_info['drafted']+=1
+        return Response(polls_info)
 
 
 class ElectionTimingViewSet(viewsets.ModelViewSet):

@@ -28,6 +28,7 @@ class ElectionInfo(models.Model):
     added_by = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
     session = models.ForeignKey('Electiontiming', on_delete=models.PROTECT)
     status = models.CharField(max_length=16, blank=True, null=True)
+    current_status = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
         managed = True
