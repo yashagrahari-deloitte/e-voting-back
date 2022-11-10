@@ -25,7 +25,7 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
             session = ElectionTimingHelper.get_current_session()
             session_id = session.uid
         print(session_id)
-        queryset = ElectionInfo.objects.filter(session_id=session_id,status='INSERT')
+        queryset = ElectionInfo.objects.filter(session_id=session_id,status='INSERT').order_by('-id')
         return queryset 
     
     def perform_create(self, serializer):

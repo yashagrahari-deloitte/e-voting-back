@@ -5,6 +5,9 @@ from election.models import ElectionInfo, Electiontiming, ElectionDropdown
 class ElectionInfoSerializer(serializers.ModelSerializer):
     """Serializer for Election"""
     election_category = serializers.CharField(source='election_type.value', read_only=True)
+    created_by_first_name = serializers.CharField(source='added_by.user.first_name',read_only=True)
+    created_by_last_name = serializers.CharField(source='added_by.user.last_name',read_only=True)
+    created_by_username = serializers.CharField(source='added_by.official',read_only=True)
 
     class Meta:
         model = ElectionInfo
