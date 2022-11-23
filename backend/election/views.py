@@ -46,12 +46,12 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
             if serializer.is_valid():
                 instance = serializer.save(added_by=official,status='INSERT',current_status='DRAFTED')
                 for phases in phase_data:
-                    for phase in phase_data.get(phases): 
-                        state = phase.get('state')
-                        constituencies = phase.get('constituency')
+                    states = phase_data.get(phases)
+                    for state in states: 
                         qry = ElectionPhaseWiseState_2022.objects.create(election_id=instance, phase=phases, state=state)
+                        constituencies = states.get(state)
                         for constituency in constituencies:
-                            ElectionStateWiseConsituency_2022.objects.create(phase_stateid=qry,constituency=constituency)   
+                            ElectionStateWiseConsituency_2022.objects.create(phase_stateid=qry,constituency=constituency.get("Constituency"))  
             else:
                 return Response(serializer.errors)
         return Response(data)
