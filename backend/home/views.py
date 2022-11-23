@@ -2,11 +2,14 @@ from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from rest_framework.response import Response
 from rest_framework import exceptions
-from rest_framework.permissions import AllowAny
+from rest_framework import viewsets
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.csrf import ensure_csrf_cookie
-from home.serializers import UserSerializer
+from home.serializers import UserSerializer, UserProfileSerializer
 from home.utils import generate_access_token, generate_refresh_token
+from home.authentication import SafeJWTAuthentication
+from home.models import UserProfile
 # Create your views here.
 
 
@@ -40,3 +43,17 @@ def login_view(request):
     }
 
     return response
+
+
+class UserProfileViewSet(viewsets.ModelViewSet):
+    """View for Manage Session Api"""
+    serializer_class = UserProfileSerializer
+    authentication_classes = [SafeJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = UserProfile.objects.filter(aadhar=user)
+        return queryset
+
+

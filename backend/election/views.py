@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from election.models import ElectionInfo, Electiontiming, ElectionDropdown
+from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionPhaseWiseState_2022, ElectionStateWiseConsituency_2022
 from home.models import OfficialsDetails
 from election import serializers
 from helpers.ElectionTiming_helper import ElectionTimingHelper
@@ -28,13 +28,33 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
         queryset = ElectionInfo.objects.filter(session_id=session_id,status='INSERT').order_by('-id')
         return queryset 
     
-    def perform_create(self, serializer):
+    # def perform_create(self, serializer):
+    #     official = OfficialsDetails.objects.get(official_id = self.request.user)
+    #     if self.request.user.is_authenticated:
+    #         instance = serializer.save(added_by=official,status='INSERT',current_status='DRAFTED')
+
+
+    @action(detail=False, methods=['post'], url_path=r'add-election')
+    def add_election(self,request):
+        data = request.data 
+        phase_data = data.get("phases_list")
+        print(data)
+        print(phase_data)
         official = OfficialsDetails.objects.get(official_id = self.request.user)
         if self.request.user.is_authenticated:
-            instance = serializer.save(added_by=official,status='INSERT',current_status='DRAFTED')
-
-
-    
+            serializer = self.serializer_class(data=data)
+            if serializer.is_valid():
+                instance = serializer.save(added_by=official,status='INSERT',current_status='DRAFTED')
+                for phase in phase_data:
+                    phase_value = phase_data.get(phase)
+                    state = phase_value.get('state')
+                    constituencies = phase_value.get('constituency')
+                    qry = ElectionPhaseWiseState_2022.objects.create(election_id=instance, phase=phase, state=state)
+                    for constituency in constituencies:
+                        ElectionStateWiseConsituency_2022.objects.create(phase_stateid=qry,constituency=constituency)   
+            else:
+                return Response(serializer.errors)
+        return Response(data)
 
     @action(detail=False, url_path=r'poll-info',)
     def post_info(self,request):
