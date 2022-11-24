@@ -30,7 +30,7 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
         return queryset 
     
     @action(detail=False, url_path=r'get-phase-state',)
-    def get_phases(self,request):
+    def get_phase_state(self,request):
         if self.request.user.is_authenticated:
             election_id = self.request.query_params.get('election_id')
             data = list(ElectionPhaseWiseState_2022.objects.filter(election_id=election_id).values())
@@ -41,7 +41,7 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
         return Response({"msg":"You are unauthorized for this request"},status=403)
 
     @action(detail=False, url_path=r'get-state-constituency',)
-    def get_phases(self,request):
+    def get_constituency(self,request):
         if self.request.user.is_authenticated:
             state_id = self.request.query_params.get('state_id')
             data = list(ElectionStateWiseConsituency_2022.objects.filter(phase_stateid=state_id).values())
