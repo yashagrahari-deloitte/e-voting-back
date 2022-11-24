@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
@@ -9,6 +8,9 @@ from home.models import OfficialsDetails
 from election import serializers
 from helpers.ElectionTiming_helper import ElectionTimingHelper
 from home.authentication import SafeJWTAuthentication
+import operator
+import itertools
+
 
 # Create your views here.
 class ElectionInfoViewSet(viewsets.ModelViewSet):
@@ -24,22 +26,36 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
         else:
             session = ElectionTimingHelper.get_current_session()
             session_id = session.uid
-        print(session_id)
         queryset = ElectionInfo.objects.filter(session_id=session_id,status='INSERT').order_by('-id')
         return queryset 
     
-    # def perform_create(self, serializer):
-    #     official = OfficialsDetails.objects.get(official_id = self.request.user)
-    #     if self.request.user.is_authenticated:
-    #         instance = serializer.save(added_by=official,status='INSERT',current_status='DRAFTED')
+    @action(detail=False, url_path=r'get-phase-state',)
+    def get_phases(self,request):
+        if self.request.user.is_authenticated:
+            election_id = self.request.query_params.get('election_id')
+            data = list(ElectionPhaseWiseState_2022.objects.filter(election_id=election_id).values())
+            response_data = {}
+            for i,g in itertools.groupby(data, key=operator.itemgetter("phase")):
+                response_data[i]=list(g)
+            return Response(response_data)
+        return Response({"msg":"You are unauthorized for this request"},status=403)
+
+    @action(detail=False, url_path=r'get-state-constituency',)
+    def get_phases(self,request):
+        if self.request.user.is_authenticated:
+            state_id = self.request.query_params.get('state_id')
+            data = list(ElectionStateWiseConsituency_2022.objects.filter(phase_stateid=state_id).values())
+            # response_data = {}
+            # for i,g in itertools.groupby(data, key=operator.itemgetter("phase")):
+            #     response_data[i]=list(g)
+            return Response(data)
+        return Response({"msg":"You are unauthorized for this request"},status=403)
 
 
     @action(detail=False, methods=['post'], url_path=r'add-election')
     def add_election(self,request):
         data = request.data 
         phase_data = data.get("phases_list")
-        print(data)
-        print(phase_data)
         official = OfficialsDetails.objects.get(official_id = self.request.user)
         if self.request.user.is_authenticated:
             serializer = self.serializer_class(data=data)
