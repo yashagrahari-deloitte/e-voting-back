@@ -45,9 +45,6 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated:
             state_id = self.request.query_params.get('state_id')
             data = list(ElectionStateWiseConsituency_2022.objects.filter(phase_stateid=state_id).values())
-            # response_data = {}
-            # for i,g in itertools.groupby(data, key=operator.itemgetter("phase")):
-            #     response_data[i]=list(g)
             return Response(data)
         return Response({"msg":"You are unauthorized for this request"},status=403)
 

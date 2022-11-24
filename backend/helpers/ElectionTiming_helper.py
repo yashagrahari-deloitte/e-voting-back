@@ -7,3 +7,6 @@ class ElectionTimingHelper(object):
         session = Electiontiming.objects.get(session_name=date.today().year)
         return session
 
+    def generate_session_table(table_name,session_name):
+        return table_name+session_name
+

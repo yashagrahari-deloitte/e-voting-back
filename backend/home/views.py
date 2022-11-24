@@ -6,10 +6,10 @@ from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.csrf import ensure_csrf_cookie
-from home.serializers import UserSerializer, UserProfileSerializer
+from home.serializers import UserSerializer, UserProfileSerializer, OfficialsDetailsSerializer
 from home.utils import generate_access_token, generate_refresh_token
 from home.authentication import SafeJWTAuthentication
-from home.models import UserProfile
+from home.models import UserProfile, OfficialsDetails
 # Create your views here.
 
 
@@ -57,3 +57,12 @@ class UserProfileViewSet(viewsets.ModelViewSet):
         return queryset
 
 
+
+class OfficialsDetailsViewSet(viewsets.ModelViewSet):
+    serializer_class = OfficialsDetailsSerializer
+    authentication_classes = [SafeJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = OfficialsDetails.objects.all()
+        return queryset

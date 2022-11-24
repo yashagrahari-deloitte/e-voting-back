@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from home.models import User, UserProfile
+from home.models import User, UserProfile, OfficialsDetails
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,3 +13,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
         fields = ['uniq_id', 'first_name', 'last_name',
                   'dob', 'gender', 'aadhar']
 
+
+class OfficialsDetailsSerializer(serializers.ModelSerializer):
+    first_name = serializers.CharField(source='user.first_name', read_only=True)
+    last_name = serializers.CharField(source='user.last_name', read_only=True)
+    class Meta:
+        model = OfficialsDetails
+        fields = "__all__"
