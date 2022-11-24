@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from election.models import ElectionInfo, Electiontiming, ElectionDropdown
+from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionRolesAssigned_2022
 
 class ElectionInfoSerializer(serializers.ModelSerializer):
     """Serializer for Election"""
@@ -31,3 +31,10 @@ class ElectionDropDownsSerializer(serializers.ModelSerializer):
         model = ElectionDropdown
         fields = ['sno','pid','field','value']
         read_only_fields = ['sno']
+
+
+class ElectionRolesAssigned_2022(serializers.ModelSerializer):
+
+    class Meta:
+        model = ElectionRolesAssigned_2022
+        fields = '__all__'
