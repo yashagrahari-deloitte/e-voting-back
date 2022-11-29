@@ -26,3 +26,17 @@ class ElectionRolesAssigned_2022(models.Model):
     constituency_id = models.ForeignKey('election.ElectionStateWiseConsituency_2022',on_delete=models.CASCADE)
     assigned_to = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
     roles = models.ForeignKey('ElectionDropdown', on_delete=models.PROTECT)
+
+    class Meta:
+        managed = True
+
+
+class ElectionLockingUnlocking_2022(models.Model):
+    phase = models.CharField(max_length=8)
+    startDate =  models.DateTimeField(default=None, null=True) 
+    endDate =  models.DateTimeField(default=None, null=True)
+    electionName = models.ForeignKey('election.ElectionInfo', on_delete=models.CASCADE)
+    lockType = models.ForeignKey('election.ElectionDropdown', on_delete=models.CASCADE)
+
+    class Meta:
+        managed = True

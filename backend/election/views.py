@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionPhaseWiseState_2022, ElectionStateWiseConsituency_2022, ElectionRolesAssigned_2022
+from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionPhaseWiseState_2022, ElectionStateWiseConsituency_2022, ElectionRolesAssigned_2022, ElectionLockingUnlocking_2022
 from home.models import OfficialsDetails
 from election import serializers
 from helpers.ElectionTiming_helper import ElectionTimingHelper
@@ -119,6 +119,11 @@ class ElectionDropdownViewSet(viewsets.ModelViewSet):
         elif request_type == 'roles': 
             roles_ids =  self.queryset.filter(field='ROLES',value__isnull=True).values_list('sno')
             self.queryset = self.queryset.filter(pid__in=roles_ids)
+        elif request_type == 'get_category':
+            self.queryset = self.queryset.filter(value__isnull=True)
+        elif request_type == 'get_subcategory':
+            s_no = self.request.query_params.get('s_no')
+            self.queryset = self.queryset.filter(pid=s_no)
         return self.queryset
     
 
@@ -131,3 +136,13 @@ class AssignRolesViewSet(viewsets.ModelViewSet):
         official_id = self.request.query_params.get('official_id')
         queryset = ElectionRolesAssigned_2022.objects.filter(assigned_to=official_id).values()
         return queryset
+
+
+class ElectionLockingUnlocking_2022ViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.ElectionLockingUnlocking_2022Serializer
+    authentication_classes = [SafeJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = ElectionLockingUnlocking_2022.objects.all().order_by('-id')
+
+    def get_queryset(self):
+        return self.queryset
