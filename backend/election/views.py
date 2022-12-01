@@ -53,6 +53,7 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
     def add_election(self,request):
         data = request.data 
         phase_data = data.get("phases_list")
+        session_id = data['session_id']
         official = OfficialsDetails.objects.get(official_id = self.request.user)
         if self.request.user.is_authenticated:
             serializer = self.serializer_class(data=data)
@@ -61,10 +62,10 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
                 for phases in phase_data:
                     states = phase_data.get(phases)
                     for state in states: 
-                        qry = ElectionPhaseWiseState_2022.objects.create(election_id=instance, phase=phases, state=state)
+                        qry = ElectionPhaseWiseState_2022.objects.create(election_id=instance, phase=phases, state=state,session_id=session_id)
                         constituencies = states.get(state)
                         for constituency in constituencies:
-                            ElectionStateWiseConsituency_2022.objects.create(phase_stateid=qry,constituency=constituency.get("Constituency"))  
+                            ElectionStateWiseConsituency_2022.objects.create(phase_stateid=qry,constituency=constituency.get("Constituency"),session_id=session_id)  
             else:
                 return Response(serializer.errors)
         return Response(data)
@@ -119,6 +120,9 @@ class ElectionDropdownViewSet(viewsets.ModelViewSet):
         elif request_type == 'roles': 
             roles_ids =  self.queryset.filter(field='ROLES',value__isnull=True).values_list('sno')
             self.queryset = self.queryset.filter(pid__in=roles_ids)
+        elif request_type == 'lock_type': 
+            locktype_ids =  self.queryset.filter(field='LOCK TYPE',value__isnull=True).values_list('sno')
+            self.queryset = self.queryset.filter(pid__in=locktype_ids)
         elif request_type == 'get_category':
             self.queryset = self.queryset.filter(value__isnull=True)
         elif request_type == 'get_subcategory':
@@ -136,6 +140,42 @@ class AssignRolesViewSet(viewsets.ModelViewSet):
         official_id = self.request.query_params.get('official_id')
         queryset = ElectionRolesAssigned_2022.objects.filter(assigned_to=official_id).values()
         return queryset
+
+    @action(detail=False, url_path=r'get-assigned-election',)
+    def get_assigned_election(self,request):
+        if self.request.user.is_authenticated:
+            user = request.user
+            official = OfficialsDetails.objects.get(official=user)
+            qry = ElectionRolesAssigned_2022.objects.filter(assigned_to=official.id).select_related('election_id')
+            data = []
+            for q in qry:
+                obj = {
+                    'title':q.election_id.title,
+                    'id':q.election_id.id
+                }
+                data.append(obj)
+        return Response(data)
+
+    @action(detail=False, url_path=r'get-assigned-details',)
+    def get_assigned_details(self,request):
+        if self.request.user.is_authenticated:
+            user = request.user
+            election_id = self.request.query_params.get('election_id')
+            official = OfficialsDetails.objects.get(official=user)
+            qry = ElectionRolesAssigned_2022.objects.filter(assigned_to=official.id,election_id=election_id).select_related('phase_stateid','constituency_id')
+            data = []
+            for q in qry:
+                phase_data = {'id':q.phase_stateid.uid,'phase':q.phase_stateid.phase,'state':q.phase_stateid.state}
+                constituency_data = {'id':q.constituency_id.uid,'constituency':q.constituency_id.constituency}
+                obj = {
+                    'phase':phase_data,
+                    'constituency':constituency_data
+                }
+                data.append(obj)
+        return Response(data)
+
+            
+    
 
 
 class ElectionLockingUnlocking_2022ViewSet(viewsets.ModelViewSet):

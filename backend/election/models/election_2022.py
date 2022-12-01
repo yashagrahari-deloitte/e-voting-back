@@ -39,9 +39,9 @@ class ElectionRolesAssigned_2022(models.Model):
 
 class ElectionLockingUnlocking_2022(models.Model):
     phase = models.CharField(max_length=8)
-    startDate =  models.DateTimeField(default=None, null=True) 
-    endDate =  models.DateTimeField(default=None, null=True)
-    electionName = models.ForeignKey('election.ElectionInfo', on_delete=models.CASCADE)
+    starttime=  models.DateTimeField(default=None, null=True) 
+    endtime =  models.DateTimeField(default=None, null=True)
+    election_id = models.ForeignKey('election.ElectionInfo', on_delete=models.CASCADE)
     lockType = models.ForeignKey('election.ElectionDropdown', on_delete=models.CASCADE)
     unlocked_by = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(db_column='created_at',auto_now=True)

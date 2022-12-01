@@ -45,4 +45,3 @@ class ElectionLockingUnlocking_2022Serializer(serializers.ModelSerializer):
     class Meta:
         model = ElectionLockingUnlocking_2022
         fields = '__all__'
-        # fields = ['id', 'phase' , 'startDate' , 'endDate' , 'electionName' , 'lockType']

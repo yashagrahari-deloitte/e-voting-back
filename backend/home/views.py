@@ -64,5 +64,6 @@ class OfficialsDetailsViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = OfficialsDetails.objects.all()
+        user = self.request.user
+        queryset = OfficialsDetails.objects.exclude(official=user)
         return queryset
