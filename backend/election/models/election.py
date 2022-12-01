@@ -7,7 +7,7 @@ class ElectionDropdown(models.Model):
     pid = models.IntegerField(db_column='Pid', blank=True, null=True)
     field = models.CharField(db_column='Field', max_length=255, blank=True, null=True)
     value = models.CharField(db_column='Value', max_length=255, blank=True, null=True)
-    status = models.CharField(max_length=16, blank=True, null=True)
+    status = models.CharField(max_length=16, blank=True, null=True,default='INSERT')
 
     class Meta:
         managed = True
@@ -26,21 +26,21 @@ class ElectionInfo(models.Model):
     election_type = models.ForeignKey('ElectionDropdown', on_delete=models.PROTECT)
     phases = models.IntegerField()
     added_by = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
-    session = models.ForeignKey('Electiontiming', on_delete=models.PROTECT)
-    status = models.CharField(max_length=16, blank=True, null=True)
+    session = models.ForeignKey('Electiontiming', default=None,null=True, on_delete=models.PROTECT)
+    status = models.CharField(max_length=16, blank=True, null=True,default='INSERT')
     current_status = models.CharField(max_length=32, blank=True, null=True)
 
     class Meta:
         managed = True
 
-class ElectionLockingUnlocking(models.Model):
-    lock_type = models.CharField(max_length=8)
-    unlock_from = models.DateTimeField(default=None, null=True)
-    unlock_to = models.DateTimeField(default=None, null=True)
-    status = models.CharField(db_column='status', default='INSERT', max_length=16)
-    unlocked_by = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
-    session = models.ForeignKey('Electiontiming', on_delete=models.PROTECT)
-    created_at = models.DateTimeField(db_column='created_at',auto_now=True)
+# class ElectionLockingUnlocking(models.Model):
+#     lock_type = models.CharField(max_length=8)
+#     unlock_from = models.DateTimeField(default=None, null=True)
+#     unlock_to = models.DateTimeField(default=None, null=True)
+#     status = models.CharField(db_column='status', default='INSERT', max_length=16)
+#     unlocked_by = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
+#     session = models.ForeignKey('Electiontiming', on_delete=models.PROTECT)
+#     created_at = models.DateTimeField(db_column='created_at',auto_now=True)
 
-    class Meta:
-        managed = True
+#     class Meta:
+#         managed = True

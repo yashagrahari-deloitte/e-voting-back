@@ -5,7 +5,7 @@ from django.contrib.auth.models import AbstractUser
 
 
 class User(AbstractUser):
-    pass
+    user_type = models.CharField(max_length = 16)
 
 class UserProfile(models.Model):
     uniq_id = models.AutoField(primary_key=True)
