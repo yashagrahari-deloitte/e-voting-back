@@ -27,3 +27,15 @@ class OfficialsDetails(models.Model):
     official = models.ForeignKey(User,to_field='username',null=True, on_delete=models.SET_NULL)
     user = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
     desg = models.ForeignKey('election.ElectionDropdown',null=True, on_delete=models.SET_NULL)
+
+class LeftPanel(models.Model):
+    sno = models.AutoField(db_column='Sno',primary_key=True)
+    pid = models.IntegerField(db_column='Pid', blank=True, null=True)
+    name = models.CharField(max_length=512,default=None)
+    route = models.CharField(max_length=512,default=None)
+
+
+class Roles(models.Model):
+    id = models.AutoField(primary_key=True)
+    official = models.ForeignKey('home.OfficialsDetails',null=True, on_delete=models.CASCADE)
+    item_id = models.ForeignKey('home.LeftPanel',null=True,on_delete=models.CASCADE)

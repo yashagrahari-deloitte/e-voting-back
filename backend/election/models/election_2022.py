@@ -38,6 +38,7 @@ class ElectionRolesAssigned_2022(models.Model):
 
 
 class ElectionLockingUnlocking_2022(models.Model):
+    id = models.AutoField(db_column='Uid',primary_key=True)
     phase = models.CharField(max_length=8)
     starttime=  models.DateTimeField(default=None, null=True) 
     endtime =  models.DateTimeField(default=None, null=True)
@@ -49,4 +50,15 @@ class ElectionLockingUnlocking_2022(models.Model):
 
     class Meta:
         managed = True
+
+
+class ElectionCandidates_2022(models.Model):
+    id = models.AutoField(db_column='Uid',primary_key=True)
+    candidate_id = models.ForeignKey('home.UserProfile',null=True, default=None, on_delete=models.CASCADE)
+    constituency = models.ForeignKey('election.ElectionStateWiseConsituency_2022',on_delete=models.CASCADE)
+    party = models.ForeignKey('election.ElectionDropdown', related_name='ElectionParty_2022' ,default=None, on_delete=models.PROTECT)
+    religion = models.ForeignKey('election.ElectionDropdown', related_name='ElectionReligion_2022', default=None, on_delete=models.PROTECT)
+    is_Indian = models.BooleanField(default=True)
+    qualification = models.JSONField(default=dict)
+
 

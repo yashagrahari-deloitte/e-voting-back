@@ -4,12 +4,12 @@ from rest_framework.response import Response
 from rest_framework import exceptions
 from rest_framework import viewsets
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from django.views.decorators.csrf import ensure_csrf_cookie
-from home.serializers import UserSerializer, UserProfileSerializer, OfficialsDetailsSerializer
+from home.serializers import UserSerializer, UserProfileSerializer, OfficialsDetailsSerializer, LeftPanelSerializer
 from home.utils import generate_access_token, generate_refresh_token
 from home.authentication import SafeJWTAuthentication
-from home.models import UserProfile, OfficialsDetails
+from home.models import UserProfile, OfficialsDetails, Roles, LeftPanel
 # Create your views here.
 
 
@@ -67,3 +67,21 @@ class OfficialsDetailsViewSet(viewsets.ModelViewSet):
         user = self.request.user
         queryset = OfficialsDetails.objects.exclude(official=user)
         return queryset
+
+class LeftPanelViewSet(viewsets.ModelViewSet):
+    serializer_class = LeftPanelSerializer
+    authentication_classes = [SafeJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, url_path=r'get-roles',)
+    def get_roles(self,request):
+        user = self.request.user
+        official = OfficialsDetails.objects.get(official=user)
+        item_list = Roles.objects.filter(official=official.id).values_list('item_id')
+        left_panel = LeftPanel.objects.filter(sno__in=item_list).values()
+        data = dict()
+        for heading in left_panel:
+            head_route = heading['name']
+            sub_route = LeftPanel.objects.filter(pid=heading['sno']).values();
+            data[head_route]=sub_route
+        return Response(data)

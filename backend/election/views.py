@@ -178,7 +178,7 @@ class AssignRolesViewSet(viewsets.ModelViewSet):
     
 
 
-class ElectionLockingUnlocking_2022ViewSet(viewsets.ModelViewSet):
+class ElectionLockingUnlockingViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ElectionLockingUnlocking_2022Serializer
     authentication_classes = [SafeJWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -186,3 +186,9 @@ class ElectionLockingUnlocking_2022ViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset
+
+
+class AddCandidateViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.ElectionCandidates_2022Serializer
+    authentication_classes = [SafeJWTAuthentication]
+    permission_classes = [IsAuthenticated]
