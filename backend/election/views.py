@@ -129,6 +129,9 @@ class ElectionDropdownViewSet(viewsets.ModelViewSet):
         elif request_type == 'religion': 
             religion_ids =  self.queryset.filter(field='RELIGION',value__isnull=True).values_list('sno')
             self.queryset = self.queryset.filter(pid__in=religion_ids)
+        elif request_type == 'degree': 
+            degree_ids =  self.queryset.filter(field='DEGREE',value__isnull=True).values_list('sno')
+            self.queryset = self.queryset.filter(pid__in=degree_ids)
         elif request_type == 'get_category':
             self.queryset = self.queryset.filter(value__isnull=True)
         elif request_type == 'get_subcategory':
@@ -198,3 +201,6 @@ class AddCandidateViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.ElectionCandidates_2022Serializer
     authentication_classes = [SafeJWTAuthentication]
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset
