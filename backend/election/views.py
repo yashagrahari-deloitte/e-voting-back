@@ -3,8 +3,9 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework import status
 from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionPhaseWiseState_2022, ElectionStateWiseConsituency_2022, ElectionRolesAssigned_2022, ElectionLockingUnlocking_2022
-from home.models import OfficialsDetails
+from home.models import OfficialsDetails, UserProfile
 from election import serializers
 from helpers.ElectionTiming_helper import ElectionTimingHelper
 from home.authentication import SafeJWTAuthentication
@@ -204,3 +205,14 @@ class AddCandidateViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return self.queryset
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        aadhar = data['aadhar_no']
+        candidate = UserProfile.objects.get(aadhar=aadhar)
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save(candidate_id=candidate.id)
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
