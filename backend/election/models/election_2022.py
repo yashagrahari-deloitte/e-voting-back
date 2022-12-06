@@ -62,3 +62,7 @@ class ElectionCandidates_2022(models.Model):
     qualification = models.JSONField(default=dict)
 
 
+class EligibleVoters_2022(models.Model):
+    id = models.AutoField(db_column='Uid',primary_key=True)
+    uniq_id = models.ForeignKey('home.UserProfile',null=True, default=None, on_delete=models.CASCADE)
+    constituency = models.CharField(max_length=512)

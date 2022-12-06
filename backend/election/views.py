@@ -123,6 +123,12 @@ class ElectionDropdownViewSet(viewsets.ModelViewSet):
         elif request_type == 'lock_type': 
             locktype_ids =  self.queryset.filter(field='LOCK TYPE',value__isnull=True).values_list('sno')
             self.queryset = self.queryset.filter(pid__in=locktype_ids)
+        elif request_type == 'party': 
+            party_ids =  self.queryset.filter(field='PARTY',value__isnull=True).values_list('sno')
+            self.queryset = self.queryset.filter(pid__in=party_ids)
+        elif request_type == 'religion': 
+            religion_ids =  self.queryset.filter(field='RELIGION',value__isnull=True).values_list('sno')
+            self.queryset = self.queryset.filter(pid__in=religion_ids)
         elif request_type == 'get_category':
             self.queryset = self.queryset.filter(value__isnull=True)
         elif request_type == 'get_subcategory':
