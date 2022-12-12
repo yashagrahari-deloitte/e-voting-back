@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
@@ -222,8 +222,7 @@ class AddCandidateViewSet(viewsets.ModelViewSet):
 
 class VerifyAndGetElectionsDetailsViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.EligibleVoters_2022Serializer
-    authentication_classes = [SafeJWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
     def get_queryset(self):
         return self.queryset
