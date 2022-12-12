@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionRolesAssigned_2022, ElectionLockingUnlocking_2022, ElectionCandidates_2022
+from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionRolesAssigned_2022, ElectionLockingUnlocking_2022,EligibleVoters_2022, ElectionCandidates_2022
 
 class ElectionInfoSerializer(serializers.ModelSerializer):
     """Serializer for Election"""
@@ -50,4 +50,11 @@ class ElectionCandidates_2022Serializer(serializers.ModelSerializer):
 
     class Meta:
         model = ElectionCandidates_2022
+        fields = '__all__'
+
+
+class EligibleVoters_2022Serializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = EligibleVoters_2022
         fields = '__all__'

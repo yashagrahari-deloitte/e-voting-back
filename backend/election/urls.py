@@ -14,6 +14,7 @@ router.register('getDropdown',views.ElectionDropdownViewSet, basename='ElectionD
 router.register('assignRole',views.AssignRolesViewSet,basename='AssignRoles')
 router.register('LockUnlock',views.ElectionLockingUnlockingViewSet, basename='ElectionLockingUnlocking')
 router.register('AddCandidates',views.AddCandidateViewSet,basename='AddCandidate')
+router.register('getElectionWiseCandidate',views.VerifyAndGetElectionsDetailsViewSet,basename='ElectionWiseCandidate')
 
 urlpatterns = [
     path('', include(router.urls)),

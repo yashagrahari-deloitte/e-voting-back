@@ -4,13 +4,15 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
-from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionPhaseWiseState_2022, ElectionStateWiseConsituency_2022, ElectionRolesAssigned_2022, ElectionLockingUnlocking_2022
+from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionPhaseWiseState_2022, ElectionStateWiseConsituency_2022, ElectionRolesAssigned_2022, ElectionLockingUnlocking_2022, EligibleVoters_2022, ElectionCandidates_2022
 from home.models import OfficialsDetails, UserProfile
 from election import serializers
 from helpers.ElectionTiming_helper import ElectionTimingHelper
 from home.authentication import SafeJWTAuthentication
 import operator
 import itertools
+from datetime import datetime
+
 
 
 # Create your views here.
@@ -212,7 +214,45 @@ class AddCandidateViewSet(viewsets.ModelViewSet):
         candidate = UserProfile.objects.get(aadhar=aadhar)
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
-            serializer.save(candidate_id=candidate.id)
+            serializer.save(candidate_id=candidate)
             return Response(data=serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class VerifyAndGetElectionsDetailsViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.EligibleVoters_2022Serializer
+    authentication_classes = [SafeJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return self.queryset
+
+    @action(detail=False, url_path=r'get-electionwise-candidates',)
+    def get_electionwise_candidates(self,request):
+        if self.request.user.is_authenticated:
+            user = request.user
+            if 'session_id' in self.request.query_params: 
+                session_id = self.request.query_params.get('session_id')
+            else:
+                session = ElectionTimingHelper.get_current_session()
+                session_id = session.uid
+            user_profile = UserProfile.objects.get(aadhar=user)
+            eligible_voter = EligibleVoters_2022.objects.filter(uniq_id=user_profile.uniq_id).values()
+            if(len(eligible_voter)>0 and eligible_voter[0]['is_voted'] == False):
+                phase_ids = ElectionStateWiseConsituency_2022.objects.filter(constituency=eligible_voter[0]['constituency'],session=session).values_list('phase_stateid')
+                elections = ElectionPhaseWiseState_2022.objects.filter(uid__in=phase_ids).values()
+                data = []
+                for election in elections:
+                    election_details = ElectionInfo.objects.filter(id=election['election_id_id']).values()
+                    # check_lock = ElectionLockingUnlocking_2022.objects.filter(starttime__gte=datetime.now(), endtime__lte=datetime.now(), phase=election['phase'],election_id=election['election_id_id']).exists()
+                    if(True):
+                        constiuency_id = ElectionStateWiseConsituency_2022.objects.filter(phase_stateid=election['uid'],constituency = eligible_voter[0]['constituency']).values('uid')
+                        candidates = list(ElectionCandidates_2022.objects.filter(constituency=constiuency_id[0]['uid']).values('candidate_id__first_name','candidate_id__last_name','constituency_id','party_id'))
+                        obj = {
+                            election_details[0]['title'] : candidates
+                        }
+                        data.append(obj)
+                return Response(data)
+            else:
+                return Response({"msg":"You are not allowed to vote"},status=204)

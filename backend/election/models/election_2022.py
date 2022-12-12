@@ -58,6 +58,7 @@ class ElectionCandidates_2022(models.Model):
     constituency = models.ForeignKey('election.ElectionStateWiseConsituency_2022',on_delete=models.CASCADE)
     party = models.ForeignKey('election.ElectionDropdown', related_name='ElectionParty_2022' ,default=None, on_delete=models.PROTECT)
     religion = models.ForeignKey('election.ElectionDropdown', related_name='ElectionReligion_2022', default=None, on_delete=models.PROTECT)
+    session = models.ForeignKey('Electiontiming',null=True, default=None, on_delete=models.PROTECT)
     is_Indian = models.BooleanField(default=True)
     qualification = models.JSONField(default=dict)
 
@@ -66,3 +67,6 @@ class EligibleVoters_2022(models.Model):
     id = models.AutoField(db_column='Uid',primary_key=True)
     uniq_id = models.ForeignKey('home.UserProfile',null=True, default=None, on_delete=models.CASCADE)
     constituency = models.CharField(max_length=512)
+    age = models.IntegerField()
+    is_voted = models.BooleanField(default=True)
+    status = models.CharField(max_length=16, blank=True, null=True,default='INSERT')
