@@ -231,7 +231,7 @@ class VerifyAndGetElectionsDetailsViewSet(viewsets.ModelViewSet):
     @action(detail=False, url_path=r'get-electionwise-candidates',)
     def get_electionwise_candidates(self,request):
         if self.request.user.is_authenticated:
-            user = request.user
+            user = self.request.query_params.get('aadhar_no')
             if 'session_id' in self.request.query_params: 
                 session_id = self.request.query_params.get('session_id')
             else:
