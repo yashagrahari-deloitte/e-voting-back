@@ -240,17 +240,16 @@ class VerifyAndGetElectionsDetailsViewSet(viewsets.ModelViewSet):
         if(len(eligible_voter)>0 and eligible_voter[0]['is_voted'] == False):
             phase_ids = ElectionStateWiseConsituency_2022.objects.filter(constituency=eligible_voter[0]['constituency'],session=session).values_list('phase_stateid')
             elections = ElectionPhaseWiseState_2022.objects.filter(uid__in=phase_ids).values()
-            data = []
+            obj = {}
             for election in elections:
                 election_details = ElectionInfo.objects.filter(id=election['election_id_id']).values()
                 # check_lock = ElectionLockingUnlocking_2022.objects.filter(starttime__gte=datetime.now(), endtime__lte=datetime.now(), phase=election['phase'],election_id=election['election_id_id']).exists()
                 if(True):
                     constiuency_id = ElectionStateWiseConsituency_2022.objects.filter(phase_stateid=election['uid'],constituency = eligible_voter[0]['constituency']).values('uid')
                     candidates = list(ElectionCandidates_2022.objects.filter(constituency=constiuency_id[0]['uid']).values('candidate_id__first_name','candidate_id__last_name','constituency_id','party_id','candidate_id','constituency_id__phase_stateid__election_id'))
-                    obj = {
-                        election_details[0]['title'] : candidates,
-                    }
-                    data.append(obj)
-            return Response(data)
+                    election_title=election_details[0]['title']
+                    obj[election_title] = candidates
+                    print(obj)
+            return Response(obj)
         else:
             return Response({"msg":"You are not allowed to vote"},status=204)
