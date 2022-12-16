@@ -82,6 +82,6 @@ class LeftPanelViewSet(viewsets.ModelViewSet):
         data = dict()
         for heading in left_panel:
             head_route = heading['name']
-            sub_route = LeftPanel.objects.filter(pid=heading['sno']).values();
+            sub_route = LeftPanel.objects.filter(pid=heading['sno']).values().order_by('priority')
             data[head_route]=sub_route
         return Response(data)

@@ -61,7 +61,7 @@ class ElectionInfoViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated:
             serializer = self.serializer_class(data=data)
             if serializer.is_valid():
-                instance = serializer.save(added_by=official,status='INSERT',current_status='DRAFTED')
+                instance = serializer.save(added_by=official,status='INSERT',current_status='DRAFTED',session_id=session_id)
                 for phases in phase_data:
                     states = phase_data.get(phases)
                     for state in states: 
@@ -152,6 +152,12 @@ class AssignRolesViewSet(viewsets.ModelViewSet):
         official_id = self.request.query_params.get('official_id')
         queryset = ElectionRolesAssigned_2022.objects.filter(assigned_to=official_id).values()
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        serializer = self.serializer_class(data=data)
+        if serializer.is_valid():
+            serializer.save()
 
     @action(detail=False, url_path=r'get-assigned-election',)
     def get_assigned_election(self,request):
