@@ -5,7 +5,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import status
 from election.models import ElectionInfo, Electiontiming, ElectionDropdown, ElectionPhaseWiseState_2022, ElectionStateWiseConsituency_2022, ElectionRolesAssigned_2022, ElectionLockingUnlocking_2022, EligibleVoters_2022, ElectionCandidates_2022
-from home.models import OfficialsDetails, UserProfile
+from home.models import OfficialsDetails, UserProfile, LeftPanel, Roles
 from election import serializers
 from helpers.ElectionTiming_helper import ElectionTimingHelper
 from home.authentication import SafeJWTAuthentication
@@ -158,6 +158,12 @@ class AssignRolesViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=data)
         if serializer.is_valid():
             serializer.save()
+            role = ElectionDropdown.objects.get(sno=data['roles'])
+            left_panel = LeftPanel.objects.get(name=role.value)
+            Roles.objects.create(item_id=left_panel,official = OfficialsDetails.objects.get(id=data['assigned_to']))
+            return Response(data=serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, url_path=r'get-assigned-election',)
     def get_assigned_election(self,request):
