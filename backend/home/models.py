@@ -33,6 +33,8 @@ class LeftPanel(models.Model):
     pid = models.IntegerField(db_column='Pid', blank=True, null=True)
     name = models.CharField(max_length=512,default=None)
     route = models.CharField(max_length=512,default=None)
+    icon = models.CharField(max_length=64,null=True,default=None)
+    priority = models.IntegerField(default=None)
 
 
 class Roles(models.Model):
