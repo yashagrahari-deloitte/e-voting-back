@@ -32,6 +32,7 @@ class ElectionRolesAssigned_2022(models.Model):
     roles = models.ForeignKey('ElectionDropdown',  default=None, on_delete=models.PROTECT)
     created_at = models.DateTimeField(db_column='created_at',auto_now=True)
     session = models.ForeignKey('Electiontiming',null=True, default=None, on_delete=models.PROTECT)
+    status = models.CharField(max_length=16, blank=True, null=True,default='INSERT')
 
     class Meta:
         managed = True
@@ -47,6 +48,7 @@ class ElectionLockingUnlocking_2022(models.Model):
     unlocked_by = models.ForeignKey(OfficialsDetails,default=None, null=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(db_column='created_at',auto_now=True)
     session = models.ForeignKey('Electiontiming',null=True, default=None, on_delete=models.PROTECT)
+    status = models.CharField(max_length=16, blank=True, null=True,default='INSERT')
 
     class Meta:
         managed = True
@@ -60,6 +62,7 @@ class ElectionCandidates_2022(models.Model):
     religion = models.ForeignKey('election.ElectionDropdown', related_name='ElectionReligion_2022', default=None, on_delete=models.PROTECT)
     session = models.ForeignKey('Electiontiming',null=True, default=None, on_delete=models.PROTECT)
     is_Indian = models.BooleanField(default=True)
+    status = models.CharField(max_length=16, blank=True, null=True,default='INSERT')
     qualification = models.JSONField(default=dict)
 
 

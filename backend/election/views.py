@@ -231,6 +231,13 @@ class AddCandidateViewSet(viewsets.ModelViewSet):
         else:
             return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(detail=False, url_path=r'get-candidate-by-constituency',)
+    def get_candidate_by_constituency(self,request):
+        constituency_id = self.request.query_params.get('constituency_id')
+        queryset = ElectionCandidates_2022.objects.filter(constituency_id=constituency_id).values()
+        return Response(queryset)
+
+
 
 class VerifyAndGetElectionsDetailsViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.EligibleVoters_2022Serializer
