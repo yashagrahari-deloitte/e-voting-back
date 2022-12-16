@@ -234,7 +234,7 @@ class AddCandidateViewSet(viewsets.ModelViewSet):
     @action(detail=False, url_path=r'get-candidate-by-constituency',)
     def get_candidate_by_constituency(self,request):
         constituency_id = self.request.query_params.get('constituency_id')
-        queryset = ElectionCandidates_2022.objects.filter(constituency_id=constituency_id).values()
+        queryset = ElectionCandidates_2022.objects.filter(constituency_id=constituency_id).values('candidate_id_id','candidate_id_id__first_name','candidate_id_id__last_name','party_id','party_id__value')
         return Response(queryset)
 
 
