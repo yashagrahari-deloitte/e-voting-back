@@ -170,7 +170,7 @@ class AssignRolesViewSet(viewsets.ModelViewSet):
         if self.request.user.is_authenticated:
             user = request.user
             official = OfficialsDetails.objects.get(official=user)
-            qry = ElectionRolesAssigned_2022.objects.filter(assigned_to=official.id).select_related('election_id')
+            qry = ElectionRolesAssigned_2022.objects.filter(assigned_to=official.id).exclude(election_id__status="DELETE").select_related('election_id')
             data = []
             for q in qry:
                 obj = {
@@ -260,6 +260,8 @@ class VerifyAndGetElectionsDetailsViewSet(viewsets.ModelViewSet):
             phase_ids = ElectionStateWiseConsituency_2022.objects.filter(constituency=eligible_voter[0]['constituency'],session=session).values_list('phase_stateid')
             elections = ElectionPhaseWiseState_2022.objects.filter(uid__in=phase_ids).values()
             obj = {}
+            obj['uniq_id'] = user
+            obj['data'] = {}
             for election in elections:
                 election_details = ElectionInfo.objects.filter(id=election['election_id_id']).values()
                 # check_lock = ElectionLockingUnlocking_2022.objects.filter(starttime__gte=datetime.now(), endtime__lte=datetime.now(), phase=election['phase'],election_id=election['election_id_id']).exists()
@@ -267,7 +269,7 @@ class VerifyAndGetElectionsDetailsViewSet(viewsets.ModelViewSet):
                     constiuency_id = ElectionStateWiseConsituency_2022.objects.filter(phase_stateid=election['uid'],constituency = eligible_voter[0]['constituency']).values('uid')
                     candidates = list(ElectionCandidates_2022.objects.filter(constituency=constiuency_id[0]['uid']).values('candidate_id__first_name','candidate_id__last_name','constituency_id','party_id','candidate_id','constituency_id__phase_stateid__election_id'))
                     election_title=election_details[0]['title']
-                    obj[election_title] = candidates
+                    obj['data'][election_title] = candidates
                     print(obj)
             return Response(obj)
         else:
